@@ -1,60 +1,67 @@
 package ru.geekbrains.screen;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.BaseScreen;
+import ru.geekbrains.math.Rect;
+import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Logo;
 
 public class MenuScreen extends BaseScreen {
 
+    float SPEED = 0.1f;
+
     private Texture img;
-    private Vector2 pos;
-    private Vector2 v;
-    private Vector2 touch;
+    private Texture bg;
+    private Background background;
+    private Logo badlogic;
+
+    private Vector2 newTouch;
+    private Vector2 distance;
 
     @Override
     public void show() {
         super.show();
         img = new Texture("badlogic.jpg");
-        pos = new Vector2();
-        v = new Vector2();
-        touch = new Vector2();
+        bg = new Texture("textures/bg.png");
+        background = new Background(bg);
+        badlogic = new Logo(img);
+
+        newTouch = new Vector2();
+        distance = new Vector2();
+
+    }
+
+    @Override
+    public void resize(Rect worldBounds) {
+        background.resize(worldBounds);
+        badlogic.resize(worldBounds);
     }
 
     @Override
     public void render(float delta) {
         super.render(delta);
 
-        if (enMoveImage01(pos, touch)) pos.add(v);
-
+        distance.set(newTouch);
+        distance.sub(badlogic.pos);
+        if (distance.len() >= 0.01f) { badlogic.pos.add( distance.scl(SPEED) ); }
         batch.begin();
-        batch.draw(img, pos.x, pos.y);
+        background.draw(batch);
+        badlogic.draw(batch);
         batch.end();
+    }
+
+    public boolean touchDown(Vector2 touch, int pointer, int button) {
+        newTouch.set(touch);
+        return false;
     }
 
     @Override
     public void dispose() {
         img.dispose();
+        bg.dispose();
         super.dispose();
     }
 
-    @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        Vector2 _touch = new Vector2();
-        touch.set(screenX, Gdx.graphics.getHeight() - screenY);
-        _touch.set(touch);
-        v.set(_touch.sub(pos));
-        v.nor();
-        return super.touchDown(screenX, screenY, pointer, button);
-    }
-
-    private boolean enMoveImage01(Vector2 _pos, Vector2 _touch)
-    {
-        Vector2 _move = new Vector2();
-        _move.set(_touch);
-        _move.sub(_pos);
-        if (_move.len() <= 1.0f)  return false;
-        else return true;
-    }
 }
