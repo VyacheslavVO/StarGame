@@ -1,67 +1,99 @@
 package ru.geekbrains.screen;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.geekbrains.base.BaseScreen;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.sprite.Background;
-import ru.geekbrains.sprite.Logo;
+import ru.geekbrains.sprite.ButtonExit;
+import ru.geekbrains.sprite.ButtonPlay;
+import ru.geekbrains.sprite.Star;
 
 public class MenuScreen extends BaseScreen {
 
-    float SPEED = 0.1f;
+    private final Game game;
 
-    private Texture img;
     private Texture bg;
     private Background background;
-    private Logo badlogic;
+    private TextureAtlas atlas;
 
-    private Vector2 newTouch;
-    private Vector2 distance;
+    private ButtonExit buttonExit;
+    private ButtonPlay buttonPlay;
+    private Star[] stars;
+
+    public MenuScreen(Game game) {
+        this.game = game;
+    }
 
     @Override
     public void show() {
         super.show();
-        img = new Texture("badlogic.jpg");
         bg = new Texture("textures/bg.png");
         background = new Background(bg);
-        badlogic = new Logo(img);
-
-        newTouch = new Vector2();
-        distance = new Vector2();
-
+        atlas = new TextureAtlas(Gdx.files.internal("textures/menuAtlas.tpack"));
+        buttonExit = new ButtonExit(atlas);
+        buttonPlay = new ButtonPlay(atlas, game);
+        stars = new Star[256];
+        for(int i = 0; i < stars.length; i++) {
+            stars[i] = new Star(atlas);
+        }
     }
 
     @Override
     public void resize(Rect worldBounds) {
         background.resize(worldBounds);
-        badlogic.resize(worldBounds);
+        buttonExit.resize(worldBounds);
+        buttonPlay.resize(worldBounds);
+        for (Star star : stars) {
+            star.resize(worldBounds);
+        }
     }
 
     @Override
     public void render(float delta) {
-        super.render(delta);
-
-        distance.set(newTouch);
-        distance.sub(badlogic.pos);
-        if (distance.len() >= 0.01f) { badlogic.pos.add( distance.scl(SPEED) ); }
-        batch.begin();
-        background.draw(batch);
-        badlogic.draw(batch);
-        batch.end();
+        update(delta);
+        draw();
     }
 
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        newTouch.set(touch);
+        buttonExit.touchDown(touch, pointer, button);
+        buttonPlay.touchDown(touch, pointer, button);
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(Vector2 touch, int pointer, int button) {
+        buttonExit.touchUp(touch, pointer, button);
+        buttonPlay.touchUp(touch, pointer, button);
         return false;
     }
 
     @Override
     public void dispose() {
-        img.dispose();
         bg.dispose();
+        atlas.dispose();
         super.dispose();
+    }
+
+    private void update(float delta) {
+        for (Star star : stars) {
+            star.update(delta);
+        }
+    }
+
+    private void draw() {
+        batch.begin();
+        background.draw(batch);
+        for (Star star : stars) {
+            star.draw(batch);
+        }
+        buttonExit.draw(batch);
+        buttonPlay.draw(batch);
+        batch.end();
     }
 
 }

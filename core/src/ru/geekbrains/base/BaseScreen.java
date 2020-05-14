@@ -62,6 +62,8 @@ public class BaseScreen implements Screen, InputProcessor {
         System.out.println("worldBounds worldBounds.height = " + worldBounds.getHeight() + " worldBounds.with = " + worldBounds.getWidth());
     }
 
+
+
     @Override
     public void pause() {
     }
