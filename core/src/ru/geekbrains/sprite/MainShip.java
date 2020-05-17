@@ -1,6 +1,8 @@
 package ru.geekbrains.sprite;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -14,6 +16,7 @@ public class MainShip extends Sprite {
     private static final float SIZE = 0.15f;
     private static final float MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
+    private static final float BULLET_INTERVAL_SHOOT = 0.15f;
 
     private final Vector2 v0;
     private final Vector2 v;
@@ -30,8 +33,14 @@ public class MainShip extends Sprite {
     private TextureRegion bulletRegion;
     private Vector2 bulletV;
 
+    private float bulletIntervalShootTimer;
+
+    private Sound soundBullet;
+
+
     public MainShip(TextureAtlas atlas, BulletPool bulletPool) {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
+        soundBullet = Gdx.audio.newSound(Gdx.files.internal("sounds/bullet.wav"));
         this.bulletPool = bulletPool;
         bulletRegion = atlas.findRegion("bulletMainShip");
         bulletV = new Vector2(0, 0.5f);
@@ -51,6 +60,12 @@ public class MainShip extends Sprite {
     @Override
     public void update(float delta) {
         pos.mulAdd(v, delta);
+        bulletIntervalShootTimer += delta;
+        if (bulletIntervalShootTimer >= BULLET_INTERVAL_SHOOT) {
+            //soundBullet.play(1.0f);
+            shoot();
+            bulletIntervalShootTimer = 0f;
+        }
         if(getLeft() < worldBounds.getLeft()) {
             stop();
             setLeft(worldBounds.getLeft());
