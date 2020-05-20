@@ -14,6 +14,7 @@ import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.MainShip;
 import ru.geekbrains.sprite.Star;
@@ -126,7 +127,17 @@ public class GameScreen extends BaseScreen {
             if(!mainShip.isOutside(enemy)) {
                 enemy.destroy();
             }
+
+            for(Bullet bullet : bulletPool.getActiveObjects()) {
+                if(bullet.getOwner().isMe(mainShip.pos)) {
+                    if(!enemy.isOutside(bullet)) {
+                        enemy.destroy();
+                    }
+                }
+            }
         }
+
+
     }
 
     private void free() {
