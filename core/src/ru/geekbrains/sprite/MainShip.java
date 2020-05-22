@@ -51,6 +51,8 @@ public class MainShip extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
+        bulletPos.set(pos.x, pos.y + getHalfHeight());
+        autoShoot(delta);
         if(getLeft() < worldBounds.getLeft()) {
             stop();
             setLeft(worldBounds.getLeft());
@@ -139,6 +141,26 @@ public class MainShip extends Ship {
 
     public void dispose() {
         sound.dispose();
+    }
+
+    public void resetToStart() {
+        leftPointer = INVALID_POINTER;
+        rightPointer = INVALID_POINTER;
+        pressedLeft = false;
+        pressedRight = false;
+
+        reloadTimer = reloadInterval;
+        hp = HP;
+        pos.x = 0;
+        v.setZero();
+        flushDestroy();
+    }
+
+    public boolean isBulletCollision(Bullet bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > pos.y
+                || bullet.getTop() < getBottom());
     }
 
     private void moveRight() { v.set(v0); }

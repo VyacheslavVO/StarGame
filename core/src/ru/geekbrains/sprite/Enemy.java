@@ -11,7 +11,9 @@ import ru.geekbrains.pool.ExplosionPool;
 
 public class Enemy extends Ship {
 
-    private boolean latch;
+    private static final float START_V_Y = -0.7f; // скорость корабля пока он весь не вышел на экран
+
+    private boolean latchScoot;
 
     public Enemy(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds, Sound sound) {
         super(bulletPool, explosionPool, worldBounds, sound);
@@ -20,14 +22,17 @@ public class Enemy extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
-        if(getBottom() <= worldBounds.getBottom()) {
+        if(getBottom() < worldBounds.getBottom()) {
             destroy();
         }
         if(getTop() <= worldBounds.getTop()) {
             v.set(v0);
-            if(latch == true) {
+            bulletPos.set(pos.x, pos.y - getHalfHeight());
+            autoShoot(delta);
+            // Чтоб вражеский корабль сделал первый выстрел сразу после выхода на экран
+            if(latchScoot == true) {
                 shoot();
-                latch = false;
+                latchScoot = false;
             }
         }
     }
@@ -53,7 +58,14 @@ public class Enemy extends Ship {
         this.reloadTimer = 0;
         this.hp = hp;
         setHeightProportion(height);
-        this.v.set(0, -0.5f);
-        this.latch = true;
+        this.v.set(0, START_V_Y);
+        this.latchScoot = true;
+    }
+
+    public boolean isBulletCollision(Bullet bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > getTop()
+                || bullet.getTop() < pos.y);
     }
 }

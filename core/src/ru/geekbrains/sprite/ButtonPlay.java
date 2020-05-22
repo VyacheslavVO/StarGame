@@ -8,6 +8,7 @@ import ru.geekbrains.math.Rect;
 import ru.geekbrains.screen.GameScreen;
 
 public class ButtonPlay extends ScaledButton {
+
     private static final float MARGIN = 0.05f;
 
     private final Game game;
