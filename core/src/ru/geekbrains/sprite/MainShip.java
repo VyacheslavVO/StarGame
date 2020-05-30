@@ -151,8 +151,8 @@ public class MainShip extends Ship {
 
         reloadTimer = reloadInterval;
         hp = HP;
-        pos.x = 0;
-        v.setZero();
+        this.pos.x = 0;
+        stop();
         flushDestroy();
     }
 
